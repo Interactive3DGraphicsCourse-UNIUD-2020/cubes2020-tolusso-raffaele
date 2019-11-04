@@ -19,7 +19,8 @@
 		<script src="lib/three.min.js"></script>
 		<script src="lib/stats.min.js"></script>
 		<script src="lib/Coordinates.js"></script>
-		<script src="lib/OrbitControls.js"></script>
+        <script src="lib/OrbitControls.js"></script>
+        <script type="text/javascript" src="lib/dat.gui.min.js"></script>
 	</head>
 	<body>
 		
@@ -28,7 +29,8 @@
         var scene, camera, renderer, controls, stats, treno, vagone, vagone1, vagone2, testa, set4Ruote, set4Ruote1, set4Ruote2,
         setRuoteTestaDietro, setRuoteDietro, setRuoteDavanti, setRuoteTestaDavanti, setRuoteCabina, setRuoteDietro1, setRuoteDavanti1,
         setRuoteDietro2, setRuoteDavanti2, tempoInizio, vagone, locomotiva, vagone1, vagone2, tempoRotatazioneTesta,
-        tempoRotatazioneVagone, tempoRotatazioneVagone1, tempoRotatazioneVagone2, tempoRotatazioneTreno, pivotTreno;
+        tempoRotatazioneVagone, tempoRotatazioneVagone1, tempoRotatazioneVagone2, tempoRotatazioneTreno, pivotTreno, trainControls,
+        stopTime, lastMoveTime;
 		
 		//return array with height data from img, taken from: http://danni-three.blogspot.it/2013/09/threejs-heightmaps.html
 		function getHeightData(img,scale) {
@@ -75,6 +77,7 @@
         }
 		function Start() {
             tempoInizio = Date.now();
+            stopTime = 0;
 			scene = new THREE.Scene();
 			camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -276,7 +279,15 @@
             
 
             //binari
-
+            //user control 
+            trainControls = {
+                moveTrain:true,
+                delay: 0
+            };
+            
+            var gui = new dat.GUI();
+            gui.remember(trainControls);
+            gui.add(trainControls, 'moveTrain');
 
 			
 			stats = new Stats();
@@ -306,111 +317,118 @@
 		}
 		
 		function Update() {
-            var clock = Date.now() - tempoInizio;
-            var partePercorso = (clock / 1000) % 40;
-            setRuoteDavanti.rotation.z = Math.PI/180 * clock/1000 * 360;
-            setRuoteDietro.rotation.z = Math.PI/180 * clock/1000 * 360;
-            setRuoteDavanti1.rotation.z = Math.PI/180 * clock/1000 * 360;
-            setRuoteDietro1.rotation.z = Math.PI/180 * clock/1000 * 360;
-            setRuoteDavanti2.rotation.z = Math.PI/180 * clock/1000 * 360;
-            setRuoteDietro2.rotation.z = Math.PI/180 * clock/1000 * 360;
-            setRuoteTestaDavanti.rotation.z = Math.PI/180 * clock/1000 * 360;
-            setRuoteTestaDietro.rotation.z = Math.PI/180 * clock/1000 * 360;
-            setRuoteCabina.rotation.z = Math.PI/180 * clock/1000 * 360;
-            
-            if(partePercorso <10 && partePercorso >= 0){
-                treno.position.x = partePercorso * 20;
-                if(partePercorso>=9.5){
-                    locomotiva.rotation.y = (partePercorso - 9.5) * Math.PI/180*10;
-                }else{                   
-                    locomotiva.rotation.y = 0;
-                }
-                if(partePercorso>=9.75){
-                    vagone.rotation.y = (partePercorso - 9.75) * Math.PI/180*10;
-                }else{
-                    vagone.rotation.y = 0;
-                }
-                if(partePercorso<=0.25){
-                    vagone1.rotation.y = (0.25 - partePercorso) * Math.PI/180*10;
-                }else{
-                    vagone1.rotation.y = 0;
-                }
-                if(partePercorso<=0.5){
-                    vagone2.rotation.y = (0.5 - partePercorso) * Math.PI/180*10;
-                }else{
-                    vagone2.rotation.y = 0;
-                }
-            }
-            if(partePercorso <20 && partePercorso >= 10){
-                treno.rotation.y = (partePercorso - 10) * Math.PI/180 * 18;
-                if(partePercorso>=19.5){
-                    locomotiva.rotation.y = (20 - partePercorso) * Math.PI/180 *10;
-                }else{
-                    locomotiva.rotation.y = 5* Math.PI/180;
-                }
-                if(partePercorso>=19.75){
-                    vagone.rotation.y = (20 - partePercorso) * Math.PI/180 *10;
-                }else{
-                    vagone.rotation.y =  2.5*Math.PI/180;
-                }
-                if(partePercorso<=10.25){
-                    vagone1.rotation.y = (partePercorso-10) * Math.PI/180 *10;
-                }else{
-                    vagone1.rotation.y = 2.5 * Math.PI/180;
-                }
-                if(partePercorso<=10.5){
-                    vagone2.rotation.y = (partePercorso-10) * Math.PI/180 *10;
-                }else{
-                    vagone2.rotation.y = 5 * Math.PI/180;
-                }
-            }
-            if(partePercorso <30 && partePercorso >= 20){
-                treno.position.x = 200 -(partePercorso - 20)*20;
-                if(partePercorso>=29.5){
-                    locomotiva.rotation.y = (partePercorso - 29.5) * Math.PI/180*10;
-                }else{
-                    locomotiva.rotation.y = 0;
-                }
-                if(partePercorso>=29.75){
-                    vagone.rotation.y = (partePercorso - 29.75) * Math.PI/180*10;
-                }else{
-                    vagone.rotation.y = 0;
-                }
-                if(partePercorso<=20.5){
-                    vagone1.rotation.y = (20.5 - partePercorso) * Math.PI/180*10;
-                }else{
-                    vagone1.rotation.y = 0;
-                }
-                if(partePercorso<=20.25){
-                    vagone2.rotation.y = (20.25 - partePercorso) * Math.PI/180*10;
-                }else{
-                    vagone2.rotation.y = 0;
-                }
-            }
-            if(partePercorso <40 && partePercorso >= 30){
-                treno.rotation.y = Math.PI + (partePercorso - 30) * Math.PI/180 * 18;
-                if(partePercorso>=39.5){
-                    locomotiva.rotation.y = (40 - partePercorso) * Math.PI/180*10;
-                }else{
-                    locomotiva.rotation.y = 5 * Math.PI/180;
-                }
-                if(partePercorso>=39.75){
-                    vagone.rotation.y = (40 - partePercorso) * Math.PI/180*10;
-                }else{
-                    vagone.rotation.y = 2.5 * Math.PI/180;
-                }
-                if(partePercorso<=30.25){
-                    vagone1.rotation.y = (partePercorso-30) * Math.PI/180*10;
-                }else{
-                    vagone1.rotation.y = 2.5 * Math.PI/180;
-                }
-                if(partePercorso<=30.5){
-                    vagone2.rotation.y = (partePercorso-30) * Math.PI/180*10;
-                }else{
-                    vagone2.rotation.y = 5 * Math.PI/180;
-                }
-            }
+            var clock = Date.now() - tempoInizio - stopTime;
 
+
+            if(trainControls.moveTrain){
+                var partePercorso = (clock / 1000) % 40;
+                setRuoteDavanti.rotation.z = Math.PI/180 * clock/1000 * 360;
+                setRuoteDietro.rotation.z = Math.PI/180 * clock/1000 * 360;
+                setRuoteDavanti1.rotation.z = Math.PI/180 * clock/1000 * 360;
+                setRuoteDietro1.rotation.z = Math.PI/180 * clock/1000 * 360;
+                setRuoteDavanti2.rotation.z = Math.PI/180 * clock/1000 * 360;
+                setRuoteDietro2.rotation.z = Math.PI/180 * clock/1000 * 360;
+                setRuoteTestaDavanti.rotation.z = Math.PI/180 * clock/1000 * 360;
+                setRuoteTestaDietro.rotation.z = Math.PI/180 * clock/1000 * 360;
+                setRuoteCabina.rotation.z = Math.PI/180 * clock/1000 * 360;
+                
+                if(partePercorso <10 && partePercorso >= 0){
+                    treno.position.x = partePercorso * 20;
+                    if(partePercorso>=9.5){
+                        locomotiva.rotation.y = (partePercorso - 9.5) * Math.PI/180*10;
+                    }else{                   
+                        locomotiva.rotation.y = 0;
+                    }
+                    if(partePercorso>=9.75){
+                        vagone.rotation.y = (partePercorso - 9.75) * Math.PI/180*10;
+                    }else{
+                        vagone.rotation.y = 0;
+                    }
+                    if(partePercorso<=0.25){
+                        vagone1.rotation.y = (0.25 - partePercorso) * Math.PI/180*10;
+                    }else{
+                        vagone1.rotation.y = 0;
+                    }
+                    if(partePercorso<=0.5){
+                        vagone2.rotation.y = (0.5 - partePercorso) * Math.PI/180*10;
+                    }else{
+                        vagone2.rotation.y = 0;
+                    }
+                }
+                if(partePercorso <20 && partePercorso >= 10){
+                    treno.rotation.y = (partePercorso - 10) * Math.PI/180 * 18;
+                    if(partePercorso>=19.5){
+                        locomotiva.rotation.y = (20 - partePercorso) * Math.PI/180 *10;
+                    }else{
+                        locomotiva.rotation.y = 5* Math.PI/180;
+                    }
+                    if(partePercorso>=19.75){
+                        vagone.rotation.y = (20 - partePercorso) * Math.PI/180 *10;
+                    }else{
+                        vagone.rotation.y =  2.5*Math.PI/180;
+                    }
+                    if(partePercorso<=10.25){
+                        vagone1.rotation.y = (partePercorso-10) * Math.PI/180 *10;
+                    }else{
+                        vagone1.rotation.y = 2.5 * Math.PI/180;
+                    }
+                    if(partePercorso<=10.5){
+                        vagone2.rotation.y = (partePercorso-10) * Math.PI/180 *10;
+                    }else{
+                        vagone2.rotation.y = 5 * Math.PI/180;
+                    }
+                }
+                if(partePercorso <30 && partePercorso >= 20){
+                    treno.position.x = 200 -(partePercorso - 20)*20;
+                    if(partePercorso>=29.5){
+                        locomotiva.rotation.y = (partePercorso - 29.5) * Math.PI/180*10;
+                    }else{
+                        locomotiva.rotation.y = 0;
+                    }
+                    if(partePercorso>=29.75){
+                        vagone.rotation.y = (partePercorso - 29.75) * Math.PI/180*10;
+                    }else{
+                        vagone.rotation.y = 0;
+                    }
+                    if(partePercorso<=20.5){
+                        vagone1.rotation.y = (20.5 - partePercorso) * Math.PI/180*10;
+                    }else{
+                        vagone1.rotation.y = 0;
+                    }
+                    if(partePercorso<=20.25){
+                        vagone2.rotation.y = (20.25 - partePercorso) * Math.PI/180*10;
+                    }else{
+                        vagone2.rotation.y = 0;
+                    }
+                }
+                if(partePercorso <40 && partePercorso >= 30){
+                    treno.rotation.y = Math.PI + (partePercorso - 30) * Math.PI/180 * 18;
+                    if(partePercorso>=39.5){
+                        locomotiva.rotation.y = (40 - partePercorso) * Math.PI/180*10;
+                    }else{
+                        locomotiva.rotation.y = 5 * Math.PI/180;
+                    }
+                    if(partePercorso>=39.75){
+                        vagone.rotation.y = (40 - partePercorso) * Math.PI/180*10;
+                    }else{
+                        vagone.rotation.y = 2.5 * Math.PI/180;
+                    }
+                    if(partePercorso<=30.25){
+                        vagone1.rotation.y = (partePercorso-30) * Math.PI/180*10;
+                    }else{
+                        vagone1.rotation.y = 2.5 * Math.PI/180;
+                    }
+                    if(partePercorso<=30.5){
+                        vagone2.rotation.y = (partePercorso-30) * Math.PI/180*10;
+                    }else{
+                        vagone2.rotation.y = 5 * Math.PI/180;
+                    }
+                }
+                lastMoveTime = Date.now();
+                trainControls.delay = stopTime;
+            }else{
+                stopTime = Date.now() - lastMoveTime + trainControls.delay;
+            }
 			requestAnimationFrame( Update );
 			controls.update();  
 			stats.update();

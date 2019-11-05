@@ -31,6 +31,11 @@ siccome il circuito compiuto dal treno è ampio e la traslazione lunga ho deciso
 
 Ho pensato di dare la possibilità di interagire con la scena scegliendo se il treno debba muoversi o meno. Ho riscontrato alcuni problemi nel controllare il treno continuando a usare il tempo come misura degli spostamenti. Se infatti si decidesse di far fermare il treno il tempo, ovviamente, continuerebbe a scorrere il porterebbe il treno a teletrsportarsi nel momento in cui lo si facesse ripartire. Per far sì che ciò non avvenga ho inserito una variabile che tenga conto del tempo in cui il treno rimane fermo e un'altra variabile che tenga conto dei ritardi.
 ![il codice che gestiscei tempi di fermata è:](textures/codiceTempi.png)
+
 (Il ritardo viene conservato nella variabile delay e il tempo di attesa incrementerà mentre la variabile gestita da GUI ha valore false)
 
 Mi era venuta l'idea di permettere anche di scegliere la velocità con cui il treno avrebbe dovuto viaggiare, ma incrociando le due cose (l'attesa e l'incremento di velocità) il codice diventerebbe molto più complesso da gestire se si volesse continuare ad utilizzare il tempo per controllare la posizione del treno.
+
+## Utilizzo HeightMap
+
+Ho costruito la funzione Field() che costruisce il terreno partendo dall'heightmap. Ho inoltre inserito le texture nel progetto e le luce prendendo il codice dall'esempio del Starting Code. Una volta caricata l'heightmap mi sono accorto che era necessario ridimensionare le proporzioni del circuito dato che heightmap con grandi dimensioni causavano un crollo delle prestazioni. una volta ridimensionato è riapparso il probelma dello slittamento del treno e sono stato costretto a reintrodurre le singole animazioni dei vagoni per rimediare. Ora il circuito e le animazioni del treno sono completate tranne che per le operazioni sull'asse Y.

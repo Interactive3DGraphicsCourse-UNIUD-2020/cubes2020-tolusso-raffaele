@@ -1,9 +1,9 @@
-# progetto Tolusso Raffaele 
+# Progetto Tolusso Raffaele 
 
-l'idea è quella di una scena al cui interno si muove un treno a vapore fatto con i cubettis
+l'idea è quella di una scena al cui interno si muove un treno a vapore fatto con i cubetti
 il treno percorrà un circuito e una volta inserita l'heightmap cercherò di adattare i movimenti del treno a quest'ultima
 
-## costruzione treno 
+## Costruzione treno 
 
 Mi sono dedicato alla costruzione del treno e delle sue parti ho preso la decisione di avere un oggetto3d (Treno per l'appunto) in cui ho inserito le sue parti per la precisione 3 vagoni e una locomotiva.
 
@@ -30,7 +30,7 @@ siccome il circuito compiuto dal treno è ampio e la traslazione lunga ho deciso
 ## Inserimento controlli movimento treno
 
 Ho pensato di dare la possibilità di interagire con la scena scegliendo se il treno debba muoversi o meno. Ho riscontrato alcuni problemi nel controllare il treno continuando a usare il tempo come misura degli spostamenti. Se infatti si decidesse di far fermare il treno il tempo, ovviamente, continuerebbe a scorrere il porterebbe il treno a teletrsportarsi nel momento in cui lo si facesse ripartire. Per far sì che ciò non avvenga ho inserito una variabile che tenga conto del tempo in cui il treno rimane fermo e un'altra variabile che tenga conto dei ritardi.
-![il codice che gestiscei tempi di fermata è:](textures/codiceTempi.png)
+![il codice che gestiscei tempi di fermata è:](documentazione/codiceTempi.png)
 
 (Il ritardo viene conservato nella variabile delay e il tempo di attesa incrementerà mentre la variabile gestita da GUI ha valore false)
 
@@ -38,4 +38,15 @@ Mi era venuta l'idea di permettere anche di scegliere la velocità con cui il tr
 
 ## Utilizzo HeightMap
 
-Ho costruito la funzione Field() che costruisce il terreno partendo dall'heightmap. Ho inoltre inserito le texture nel progetto e le luce prendendo il codice dall'esempio del Starting Code. Una volta caricata l'heightmap mi sono accorto che era necessario ridimensionare le proporzioni del circuito dato che heightmap con grandi dimensioni causavano un crollo delle prestazioni. una volta ridimensionato è riapparso il probelma dello slittamento del treno e sono stato costretto a reintrodurre le singole animazioni dei vagoni per rimediare. Ora il circuito e le animazioni del treno sono completate tranne che per le operazioni sull'asse Y.
+Ho costruito la funzione Field() che costruisce il terreno partendo dall'heightmap. Ho inoltre inserito le texture nel progetto e le luce prendendo il codice dall'esempio del Starting Code. Una volta caricata l'heightmap mi sono accorto che era necessario ridimensionare le proporzioni del circuito dato che heightmap con grandi dimensioni causavano un crollo delle prestazioni. Una volta ridimensionato è riapparso il problema dello slittamento del treno e sono stato costretto a reintrodurre le singole animazioni dei vagoni per rimediare. Ora il circuito e le animazioni del treno sono completate tranne che per le operazioni sull'asse Y.
+
+![spiegazione animazione locomotiva (lo stesso si applica per i vagoni con le loro relative distanze)](documentazione/motoCircuito.jpeg)
+
+### Ritocchi
+
+Ho sistemato l' Heightmap in modo che rappresenti il circuito e aggiunto l'animazione di salita calcolando la posizione Y con un po di trigonometria. 
+
+![spiegazione moto in salita](documentazione/motoY.jpeg)
+
+Ho modificato molti materiali e aggiunto le textures a quasi tutte le parti del treno e aggiunto una "Bolla di Vapore" alla locomotiva che viene animata anche quando il treno è fermo. Ho rimpostato l'up della camera a quello di default dato che l'Heightmap suggerisce anche una vista verso -Z (le montagne sono in quella direzione).
+

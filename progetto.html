@@ -28,9 +28,8 @@
 		
         var scene, camera, renderer, controls, stats, treno, vagone, vagone1, vagone2, testa, set4Ruote, set4Ruote1, set4Ruote2,
         setRuoteTestaDietro, setRuoteDietro, setRuoteDavanti, setRuoteTestaDavanti, setRuoteCabina, setRuoteDietro1, setRuoteDavanti1,
-        setRuoteDietro2, setRuoteDavanti2, tempoInizio, vagone, locomotiva, vagone1, vagone2, tempoRotatazioneTesta,
-        tempoRotatazioneVagone, tempoRotatazioneVagone1, tempoRotatazioneVagone2, tempoRotatazioneTreno, trainControls,
-        stopTime, lastMoveTime, pivotLocomotiva, pivotVagone, pivotVagone1, pivotVagone2;
+        setRuoteDietro2, setRuoteDavanti2, tempoInizio, vagone, locomotiva, vagone1, vagone2, trainControls,
+        stopTime, lastMoveTime, pivotLocomotiva, pivotVagone, pivotVagone1, pivotVagone2, toDegree, bollaDiVapore;
 		
 		//return array with height data from img, taken from: http://danni-three.blogspot.it/2013/09/threejs-heightmaps.html
 		function getHeightData(img,scale) {
@@ -68,16 +67,26 @@
             var cube_geometry = new THREE.CubeGeometry(1, 1, 1); // raggio altezza
             var width = img.width;
             var height = img.height;
-            var grass = THREE.ImageUtils.loadTexture('textures/grass.png');
+            var grass = THREE.ImageUtils.loadTexture('textures/grass.jpg');
             var water = THREE.ImageUtils.loadTexture('textures/water.jpg');
-            var rock  = THREE.ImageUtils.loadTexture('textures/rock.png');
+            var rock  = THREE.ImageUtils.loadTexture('textures/rock.jpg');
+            var snow  = THREE.ImageUtils.loadTexture('textures/snow.jpg');
+            var ground = THREE.ImageUtils.loadTexture('textures/ground.jpg');
 			for(i = 0 ; i < data.length; i++){
                 var texture = rock;
-                if(data[i]<10){
+                if(data[i]<7){
                     texture = water;
                 }else{
-                    if(data[i]<20){
+                    if(data[i]<13){
                         texture = grass;
+                    }else{
+                        if(data[i]>24){
+                            texture = snow;
+                        }else{
+                            if(data[i]<20){
+                                texture = ground;
+                            }
+                        }
                     }
                 }
                 var cube_material = new THREE.MeshPhongMaterial( { map: texture } );
@@ -95,6 +104,7 @@
         }
 		function Start() {
             tempoInizio = Date.now();
+            toDegree = Math.PI/180;
             stopTime = 0;
 			scene = new THREE.Scene();
 			camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -108,9 +118,7 @@
 			renderer.shadowMap.enabled = true;
 			document.body.appendChild( renderer.domElement );
 			
-			camera.position.set(0,60,0);
-            camera.up.set(0,0,-1);
-            camera.up.set(0,0,-1);
+			camera.position.set(0,35,35);
 
 			
             var geometry = new THREE.BoxGeometry(1,1,1);
@@ -125,7 +133,7 @@
             pivotVagone1 = new THREE.Object3D();
             pivotVagone2 = new THREE.Object3D();
 
-            treno.position.y = 20;
+            treno.position.y = 14;
             //vagoni 0,1,2
             vagone = new THREE.Object3D();
             vagone.position.z = 10;
@@ -136,26 +144,31 @@
             vagone2 = new THREE.Object3D();
             vagone2.position.z = 10;
 
-            var materialeContenitore = new THREE.MeshBasicMaterial( { color: 0xa00000 } );
+            var textureVagone = THREE.ImageUtils.loadTexture('textures/vagone.jpg');
+            var materialeContenitore = new THREE.MeshPhongMaterial( { map: textureVagone } );
 			var contenitore = new THREE.Mesh( geometry, materialeContenitore );
             contenitore.scale.set(4,2,2);
             vagone.add(contenitore);
             
-            var materialeContenitore1 = new THREE.MeshBasicMaterial( { color: 0x404000 } );
+            var textureVagone1 = THREE.ImageUtils.loadTexture('textures/vagone1.jpg');
+            var materialeContenitore1 = new THREE.MeshPhongMaterial( { map: textureVagone1 } );
             var contenitore1 = contenitore.clone();
             contenitore1.material = materialeContenitore1;
             vagone1.add(contenitore1);
 
-            var materialeContenitore2 = new THREE.MeshBasicMaterial( { color: 0x004040 } );
+            var textureVagone2 = THREE.ImageUtils.loadTexture('textures/vagone2.jpg');
+            var materialeContenitore2 = new THREE.MeshPhongMaterial( { map: textureVagone2 } );
             var contenitore2 = contenitore.clone();
             contenitore2.material = materialeContenitore2;
             vagone2.add(contenitore2);
-            //testa
+            //locomotiva
             locomotiva = new THREE.Object3D();
-            var materialeLocomotiva = new THREE.MeshBasicMaterial( { color: 0x000000 } );
+            var textureLocomotiva = THREE.ImageUtils.loadTexture('textures/locomotiva.jpeg');
+            var materialeLocomotiva = new THREE.MeshPhongMaterial( { map: textureLocomotiva } );
             locomotiva.position.z = 10;
 
-            var materialeCabina = new THREE.MeshBasicMaterial( { color: 0x333333 } );
+            var textureCabina = THREE.ImageUtils.loadTexture('textures/cabina.jpeg');
+            var materialeCabina = new THREE.MeshPhongMaterial( { map: textureCabina } );
 			var cabina = new THREE.Mesh( geometry, materialeCabina );
             cabina.scale.set(2,4,2);
             cabina.position.x = -2;
@@ -164,24 +177,35 @@
 
             var motrice = new THREE.Mesh( geometry, materialeLocomotiva );
             motrice.scale.set(4,2,2);
-            motrice.rotation.x = 45 * Math.PI/180;
+            motrice.rotation.x = 45 * toDegree;
             motrice.position.y = Math.sqrt(2) - 1;
             motrice.position.x = 1;
             locomotiva.add(motrice);
 
+            //camino
             var baseCamino = new THREE.Mesh( geometry, materialeLocomotiva);
             baseCamino.scale.set(1,2,1);
-            baseCamino.rotation.y = 45 * Math.PI/180;
+            baseCamino.rotation.y = 45 * toDegree;
             baseCamino.position.y = 2;
             baseCamino.position.x = 1.5;
             locomotiva.add(baseCamino);
 
             var testaCamino = new THREE.Mesh( geometry, materialeLocomotiva);
             testaCamino.scale.set(1.5,0.25,1.5);
-            testaCamino.rotation.y = 45 * Math.PI/180;
+            testaCamino.rotation.y = 45 * toDegree;
             testaCamino.position.y = 3;
             testaCamino.position.x = 1.5;
             locomotiva.add(testaCamino);
+
+            //fumo
+            var vapore = new THREE.MeshBasicMaterial({color: 0x888888 , wireframe: true})
+            bollaDiVapore  = new THREE.Mesh( geometry, vapore);
+            bollaDiVapore.scale.set(0.3,0.3,0.3);
+            bollaDiVapore.rotation.x = 45 * toDegree;
+            bollaDiVapore.rotation.y = 45 * toDegree;
+            bollaDiVapore.position.y = 3;
+            bollaDiVapore.position.x = 1.5;
+            locomotiva.add(bollaDiVapore);
 
             //ruote
             setDiRuote = new THREE.Object3D();
@@ -192,40 +216,43 @@
             setDiRuote.add(ruotadx);
             ruotadx.position.z = sqrt2;
 
-            var materialeGomma = new THREE.MeshBasicMaterial({color: 0x222222});
+            var materialeGomma = new THREE.MeshBasicMaterial({color: 0x000000})
             var gomma = new THREE.Mesh( geometry, materialeGomma);
             gomma.scale.set(0.5,0.5,0.1);
-            gomma.rotation.z = 45 * Math.PI/180;
+            gomma.rotation.z = 45 * toDegree;
             ruotadx.add(gomma);
 
-            var materialeCerchione = new THREE.MeshBasicMaterial({color: 0xaaaaaa});
-            var cerchione = new THREE.Mesh( geometry, materialeCerchione);
+            var textureAcciaio = THREE.ImageUtils.loadTexture('textures/steel.jpg');
+            var acciaio = new THREE.MeshPhongMaterial( { map: textureAcciaio } );
+
+            var cerchione = new THREE.Mesh( geometry, acciaio);
             cerchione.scale.set(0.4,0.4,0.15);
-            cerchione.rotation.z = 45 * Math.PI/180;
+            cerchione.rotation.z = 45 * toDegree;
             ruotadx.add(cerchione);
 
-            var asse = new THREE.Mesh( geometry, materialeCerchione);
+            var asse = new THREE.Mesh( geometry, acciaio);
             asse.scale.set(0.05,0.05,2 * sqrt2);
-            asse.rotation.z = 45 * Math.PI/180;
+            asse.rotation.z = 45 * toDegree;
             setDiRuote.add(asse);
 
             var ruotasx = new THREE.Object3D();
             ruotasx = ruotadx.clone();
             setDiRuote.add(ruotasx);
             ruotasx.position.z = -sqrt2;
+
             //ruote motrice
             setRuoteTestaDietro = setDiRuote.clone();
-            //setRuoteTestaDietro.scale.set(1,1,1/2);
             locomotiva.add(setRuoteTestaDietro);
 
             setRuoteTestaDavanti = setRuoteTestaDietro.clone();
             setRuoteTestaDavanti.position.x = 2;
             locomotiva.add(setRuoteTestaDavanti);
+
             //ruote cabina
             setRuoteCabina = setDiRuote.clone();
-            //setRuoteCabina.scale.set(1.2,1.2,1.2);
             setRuoteCabina.position.x = -2;
             locomotiva.add(setRuoteCabina);
+
             //ruote vagone 0,1,2
             var set4Ruote = new THREE.Object3D();
 
@@ -262,18 +289,17 @@
 
 
             //ganci 0, 1, 2 si trovano nella parte frontale di ogni vagone
-            var materialeGanci = new THREE.MeshBasicMaterial( { color: 0xaaaaaa } );
             var gancio = new THREE.Object3D();
             gancio.position.x = 2.5;
-			var perno = new THREE.Mesh( geometry, materialeGanci);
+			var perno = new THREE.Mesh( geometry, acciaio);
             perno.scale.set(0.5,0.25,0.5);
             gancio.add(perno);
-            var ganciosx = new THREE.Mesh( geometry, materialeGanci);
-            ganciosx.scale.set(1,0.25,0.25);
+            var ganciosx = new THREE.Mesh( geometry, acciaio);
+            ganciosx.scale.set(1.5,0.25,0.25);
             ganciosx.position.z = -0.25;
             gancio.add(ganciosx);
-            var ganciodx = new THREE.Mesh( geometry, materialeGanci);
-            ganciodx.scale.set(1,0.25,0.25);
+            var ganciodx = new THREE.Mesh( geometry, acciaio);
+            ganciodx.scale.set(1.5,0.25,0.25);
             ganciodx.position.z = 0.25;
             gancio.add(ganciodx);
             vagone.add(gancio);
@@ -301,8 +327,6 @@
 
             scene.add( treno );
             
-
-            //binari
             //user control 
             trainControls = {
                 moveTrain:true,
@@ -320,7 +344,7 @@
 			document.body.appendChild( stats.domElement );
 			
 			// uncomment if you need to draw coordinate axes when building the scene
-			Coordinates.drawAllAxes();
+			//Coordinates.drawAllAxes();
 			
 			controls = new THREE.OrbitControls( camera );
 			controls.addEventListener( 'change', Render );
@@ -328,7 +352,7 @@
 			// terrain
 			var img = new Image();
             // load img source
-            img.src = "textures/heightmapprova.png";
+            img.src = "textures/heightmap.png";
 			img.onload = function () {
 				
                 //get height data from img
@@ -370,185 +394,189 @@
 		function Update() {
             var clock = Date.now() - tempoInizio - stopTime;
 
+            //la bolla si anima anche se il treno è fermo
+            var bollaTempo = ((Date.now() - tempoInizio) / 1000) % 3;
+            bollaDiVapore.scale.set(bollaTempo,bollaTempo,bollaTempo);
+            bollaDiVapore.position.y = bollaTempo + 3;
 
             if(trainControls.moveTrain){
                 var partePercorso = (clock / 1000) % 100;
-                setRuoteDavanti.rotation.z = Math.PI/180 * clock/1000 * 360;
-                setRuoteDietro.rotation.z = Math.PI/180 * clock/1000 * 360;
-                setRuoteDavanti1.rotation.z = Math.PI/180 * clock/1000 * 360;
-                setRuoteDietro1.rotation.z = Math.PI/180 * clock/1000 * 360;
-                setRuoteDavanti2.rotation.z = Math.PI/180 * clock/1000 * 360;
-                setRuoteDietro2.rotation.z = Math.PI/180 * clock/1000 * 360;
-                setRuoteTestaDavanti.rotation.z = Math.PI/180 * clock/1000 * 360;
-                setRuoteTestaDietro.rotation.z = Math.PI/180 * clock/1000 * 360;
-                setRuoteCabina.rotation.z = Math.PI/180 * clock/1000 * 360;
+                setRuoteDavanti.rotation.z = toDegree * clock/1000 * 360;
+                setRuoteDietro.rotation.z = toDegree * clock/1000 * 360;
+                setRuoteDavanti1.rotation.z = toDegree * clock/1000 * 360;
+                setRuoteDietro1.rotation.z = toDegree * clock/1000 * 360;
+                setRuoteDavanti2.rotation.z = toDegree * clock/1000 * 360;
+                setRuoteDietro2.rotation.z = toDegree * clock/1000 * 360;
+                setRuoteTestaDavanti.rotation.z = toDegree * clock/1000 * 360;
+                setRuoteTestaDietro.rotation.z = toDegree * clock/1000 * 360;
+                setRuoteCabina.rotation.z = toDegree * clock/1000 * 360;
 
                 //animazione locomotiva
                 if(partePercorso<=2.5){
                     if(partePercorso<=2){
-                        locomotiva.rotation.z = Math.PI/180*20;
+                        locomotiva.rotation.z = toDegree*15;
                         pivotLocomotiva.position.x = partePercorso + 7.5;
-                        pivotLocomotiva.position.y = partePercorso /360 * 20;
+                        pivotLocomotiva.position.y = (17.5 * Math.tan(toDegree * 15) + partePercorso * Math.tan(toDegree * 15));
                     }else{
-                        locomotiva.rotation.z = Math.PI/180*20 * (2.5 - partePercorso);
+                        locomotiva.rotation.z = toDegree*15 * (2.5 - partePercorso);
                         pivotLocomotiva.position.x = partePercorso + 7.5;
                     }
                 }
                 if(partePercorso <=32.5 && partePercorso > 2.5){
-                    pivotLocomotiva.rotation.y = (partePercorso - 2.5) * Math.PI/180 * 6;
+                    pivotLocomotiva.rotation.y = (partePercorso - 2.5) * toDegree * 6;
                 }
                 if(partePercorso<=52.5 && partePercorso> 32.5){
                     if(partePercorso<=33){
-                        locomotiva.rotation.z = Math.PI/180*(-20) * (partePercorso-32.5);
+                        locomotiva.rotation.z = toDegree*(-15) * (partePercorso-32.5);
                         pivotLocomotiva.position.x = 10 - (partePercorso - 32.5);
                     }else{
                         if(partePercorso<=52){
-                            locomotiva.rotation.z = Math.PI/180*(-20);
+                            locomotiva.rotation.z = toDegree*(-15);
                             pivotLocomotiva.position.x = 10 - (partePercorso - 32.5);
-                            pivotLocomotiva.position.y = (2.5 - (partePercorso - 32.5)) /360 * 20;
+                            pivotLocomotiva.position.y = (20 * Math.tan(toDegree * 15) - (partePercorso -32.5) * Math.tan(toDegree * 15));
                         }else{
-                            locomotiva.rotation.z = Math.PI/180*(-20) * (52.5 - partePercorso);
+                            locomotiva.rotation.z = toDegree*(-15) * (52.5 - partePercorso);
                             pivotLocomotiva.position.x = 10 - (partePercorso - 32.5);
                         }
                     }
                 }
                 if(partePercorso <=82.5 && partePercorso > 52.5){
-                    pivotLocomotiva.rotation.y = Math.PI + (partePercorso - 52.5) * Math.PI/180 * 6;
+                    pivotLocomotiva.rotation.y = Math.PI + (partePercorso - 52.5) * toDegree * 6;
                 }
                 if(partePercorso> 82.5){
                     if(partePercorso<=83){
-                        locomotiva.rotation.z = Math.PI/180*(20) * (partePercorso-82.5);
+                        locomotiva.rotation.z = toDegree*(15) * (partePercorso-82.5);
                         pivotLocomotiva.position.x = -10 + (partePercorso - 82.5);
                     }else{
-                        locomotiva.rotation.z = Math.PI/180*(20);
+                        locomotiva.rotation.z = toDegree*(15);
                         pivotLocomotiva.position.x = -10 + (partePercorso - 82.5);
-                        pivotLocomotiva.position.y = partePercorso /360 * 20;                       
+                        pivotLocomotiva.position.y = (partePercorso -82.5) * Math.tan(toDegree * 15);                       
                     }
                 }
                 //animazione vagone
                 if(partePercorso<=8.5){
                     if(partePercorso<=8){
-                        vagone.rotation.z = Math.PI/180*20;
+                        vagone.rotation.z = toDegree * 15;
                         pivotVagone.position.x = partePercorso + 1.5;
-                        pivotVagone.position.y = partePercorso /360 * 20;
+                        pivotVagone.position.y = (11.5 * Math.tan(toDegree * 15) + partePercorso * Math.tan(toDegree * 15));
                     }else{
-                        vagone.rotation.z = Math.PI/180*20 * (8.5 - partePercorso);
+                        vagone.rotation.z = toDegree * 15 * (8.5 - partePercorso);
                         pivotVagone.position.x = partePercorso + 1.5;
                     }
                 }
                 if(partePercorso <=38.5 && partePercorso > 8.5){
-                    pivotVagone.rotation.y = (partePercorso - 8.5) * Math.PI/180 * 6;
+                    pivotVagone.rotation.y = (partePercorso - 8.5) * toDegree * 6;
                 }
                 if(partePercorso<=58.5 && partePercorso> 38.5){
                     if(partePercorso<=39){
-                        vagone.rotation.z = Math.PI/180*(-20) * (partePercorso-38.5);
+                        vagone.rotation.z = toDegree *(-15) * (partePercorso-38.5);
                         pivotVagone.position.x = 10 - (partePercorso - 38.5);
                     }else{
                         if(partePercorso<=58){
-                            vagone.rotation.z = Math.PI/180*(-20);
+                            vagone.rotation.z = toDegree *(-15);
                             pivotVagone.position.x = 10 - (partePercorso - 38.5);
-                            pivotVagone.position.y = (8.5 - (partePercorso - 38.5)) /360 * 20;
+                            pivotVagone.position.y = (20 * Math.tan(toDegree * 15) - (partePercorso -38.5) * Math.tan(toDegree * 15));
                         }else{
-                            vagone.rotation.z = Math.PI/180*(-20) * (58.5 - partePercorso);
+                            vagone.rotation.z = toDegree *(-15) * (58.5 - partePercorso);
                             pivotVagone.position.x = 10 - (partePercorso - 38.5);
                         }
                     }
                 }
                 if(partePercorso <=88.5 && partePercorso > 58.5){
-                    pivotVagone.rotation.y = Math.PI + (partePercorso - 58.5) * Math.PI/180 * 6;
+                    pivotVagone.rotation.y = Math.PI + (partePercorso - 58.5) * toDegree * 6;
                 }
                 if(partePercorso> 88.5){
                     if(partePercorso<=88){
-                        vagone.rotation.z = Math.PI/180*(20) * (partePercorso-88.5);
+                        vagone.rotation.z = toDegree * 15 * (partePercorso-88.5);
                         pivotVagone.position.x = -10 + (partePercorso - 88.5);
                     }else{
-                        vagone.rotation.z = Math.PI/180*(20);
+                        vagone.rotation.z = toDegree * 15;
                         pivotVagone.position.x = -10 + (partePercorso - 88.5);
-                        pivotVagone.position.y = partePercorso /360 * 20;                       
+                        pivotVagone.position.y = (partePercorso -88.5) * Math.tan(toDegree * 15);                        
                     }
                 }
                 //animazione vagone1
                 if(partePercorso<=13.5){
                     if(partePercorso<=13){
-                        vagone1.rotation.z = Math.PI/180*20;
+                        vagone1.rotation.z = toDegree * 15;
                         pivotVagone1.position.x = partePercorso -3.5;
-                        pivotVagone1.position.y = partePercorso /360 * 20;
+                        pivotVagone1.position.y = (6.5 * Math.tan(toDegree * 15) + partePercorso * Math.tan(toDegree * 15));
                     }else{
-                        vagone1.rotation.z = Math.PI/180*20 * (13.5 - partePercorso);
+                        vagone1.rotation.z = toDegree * 15 * (13.5 - partePercorso);
                         pivotVagone1.position.x = partePercorso -3.5;
                     }
                 }
                 if(partePercorso <=43.5 && partePercorso > 13.5){
-                    pivotVagone1.rotation.y = (partePercorso - 13.5) * Math.PI/180 * 6;
+                    pivotVagone1.rotation.y = (partePercorso - 13.5) * toDegree * 6;
                 }
                 if(partePercorso<=63.5 && partePercorso> 43.5){
                     if(partePercorso<=44){
-                        vagone1.rotation.z = Math.PI/180*(-20) * (partePercorso-43.5);
+                        vagone1.rotation.z = toDegree *(-15) * (partePercorso-43.5);
                         pivotVagone1.position.x = 10 - (partePercorso - 43.5);
                     }else{
                         if(partePercorso<=63){
-                            vagone1.rotation.z = Math.PI/180*(-20);
+                            vagone1.rotation.z = toDegree *(-15);
                             pivotVagone1.position.x = 10 - (partePercorso - 43.5);
-                            pivotVagone1.position.y = (13.5 - (partePercorso - 43.5)) /360 * 20;
+                            pivotVagone1.position.y = (20 * Math.tan(toDegree * 15) - (partePercorso -43.5) * Math.tan(toDegree * 15));
                         }else{
-                            vagone1.rotation.z = Math.PI/180*(-20) * (63.5 - partePercorso);
+                            vagone1.rotation.z = toDegree *(-15) * (63.5 - partePercorso);
                             pivotVagone1.position.x = 10 - (partePercorso - 43.5);
                         }
                     }
                 }
                 if(partePercorso <=93.5 && partePercorso > 63.5){
-                    pivotVagone1.rotation.y = Math.PI + (partePercorso - 63.5) * Math.PI/180 * 6;
+                    pivotVagone1.rotation.y = Math.PI + (partePercorso - 63.5) * toDegree * 6;
                 }
                 if(partePercorso> 93.5){
                     if(partePercorso<=94){
-                        vagone1.rotation.z = Math.PI/180*(20) * (partePercorso-93.5);
+                        vagone1.rotation.z = toDegree * 15 * (partePercorso-93.5);
                         pivotVagone1.position.x = -10 + (partePercorso - 93.5);
                     }else{
-                        vagone1.rotation.z = Math.PI/180*(20);
+                        vagone1.rotation.z = toDegree * 15;
                         pivotVagone1.position.x = -10 + (partePercorso - 93.5);
-                        pivotVagone1.position.y = partePercorso /360 * 20;                       
+                        pivotVagone1.position.y = (partePercorso -93.5) * Math.tan(toDegree * 15);                        
                     }
                 }
                 //animazione vagone2
                 if(partePercorso<=18.5){
                     if(partePercorso<=18){
-                        vagone2.rotation.z = Math.PI/180*20;
+                        vagone2.rotation.z = toDegree * 15;
                         pivotVagone2.position.x = partePercorso -8.5;
-                        pivotVagone2.position.y = partePercorso /360 * 20;
+                        pivotVagone2.position.y = (1.5 * Math.tan(toDegree * 15) + partePercorso * Math.tan(toDegree * 15));
                     }else{
-                        vagone2.rotation.z = Math.PI/180*20 * (18.5 - partePercorso);
+                        vagone2.rotation.z = toDegree * 15 * (18.5 - partePercorso);
                         pivotVagone2.position.x = partePercorso -8.5;
                     }
                 }
                 if(partePercorso <=48.5 && partePercorso > 18.5){
-                    pivotVagone2.rotation.y = (partePercorso - 18.5) * Math.PI/180 * 6;
+                    pivotVagone2.rotation.y = (partePercorso - 18.5) * toDegree * 6;
                 }
                 if(partePercorso<=68.5 && partePercorso> 48.5){
                     if(partePercorso<=49){
-                        vagone2.rotation.z = Math.PI/180*(-20) * (partePercorso-48.5);
+                        vagone2.rotation.z = toDegree *(-15) * (partePercorso-48.5);
                         pivotVagone2.position.x = 10 - (partePercorso - 48.5);
                     }else{
                         if(partePercorso<=69){
-                            vagone2.rotation.z = Math.PI/180*(-20);
+                            vagone2.rotation.z = toDegree *(-15);
                             pivotVagone2.position.x = 10 - (partePercorso - 48.5);
-                            pivotVagone2.position.y = (18.5 - (partePercorso - 48.5)) /360 * 20;
+                            pivotVagone2.position.y = (20 * Math.tan(toDegree * 15) - (partePercorso -48.5) * Math.tan(toDegree * 15));
                         }else{
-                            vagone2.rotation.z = Math.PI/180*(-20) * (68.5 - partePercorso);
+                            vagone2.rotation.z = toDegree *(-15) * (68.5 - partePercorso);
                             pivotVagone2.position.x = 10 - (partePercorso - 48.5);
                         }
                     }
                 }
                 if(partePercorso <=98.5 && partePercorso > 68.5){
-                    pivotVagone2.rotation.y = Math.PI + (partePercorso - 68.5) * Math.PI/180 * 6;
+                    pivotVagone2.rotation.y = Math.PI + (partePercorso - 68.5) * toDegree * 6;
                 }
                 if(partePercorso> 98.5){
-                    if(partePercorso<=94){
-                        vagone2.rotation.z = Math.PI/180*(20) * (partePercorso-98.5);
+                    if(partePercorso<=99){
+                        vagone2.rotation.z = toDegree * 15 * (partePercorso-98.5);
                         pivotVagone2.position.x = -10 + (partePercorso - 98.5);
                     }else{
-                        vagone2.rotation.z = Math.PI/180*(20);
+                        vagone2.rotation.z = toDegree * 15;
                         pivotVagone2.position.x = -10 + (partePercorso - 98.5);
-                        pivotVagone2.position.y = partePercorso /360 * 20;                       
+                        pivotVagone2.position.y = (partePercorso -98.5) * Math.tan(toDegree * 15);                     
                     }
                 }
 

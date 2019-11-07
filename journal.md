@@ -1,6 +1,6 @@
 # Progetto Tolusso Raffaele 
 
-l'idea è quella di una scena al cui interno si muove un treno a vapore fatto con i cubetti
+L'idea è quella di una scena al cui interno si muove un treno a vapore fatto con i cubetti
 il treno percorrà un circuito e una volta inserita l'heightmap cercherò di adattare i movimenti del treno a quest'ultima
 
 ## Costruzione treno 
@@ -10,7 +10,7 @@ Mi sono dedicato alla costruzione del treno e delle sue parti ho preso la decisi
 - Ogni vagone è composto da un carico e dalle sue ruote che si muoveranno a coppia di due.
 - La locomotiva è composta dalla cabina, dalla motrice e dal camino (anch'esso suddiviso in due parti).
 
-## problematiche di animazione del treno
+## Problematiche di animazione del treno
 
 Ho iniziato l'animazione del treno:
 
@@ -48,5 +48,5 @@ Ho sistemato l' Heightmap in modo che rappresenti il circuito e aggiunto l'anima
 
 ![spiegazione moto in salita](documentazione/motoY.jpeg)
 
-Ho modificato molti materiali e aggiunto le textures a quasi tutte le parti del treno e aggiunto una "Bolla di Vapore" alla locomotiva che viene animata anche quando il treno è fermo. Ho rimpostato l'up della camera a quello di default dato che l'Heightmap suggerisce anche una vista verso -Z (le montagne sono in quella direzione).
+Ho modificato molti materiali e aggiunto le textures a quasi tutte le parti del treno e aggiunto il vapore alla locomotiva che rimane animato anche per un po' dopo che la locomotiva si ferma. Ho reimpostato l'up della camera a quello di default dato che l'Heightmap suggerisce anche una vista verso -Z (le montagne sono in quella direzione).
 

@@ -26,10 +26,11 @@
 		
 		<script>
 		
-        var scene, camera, renderer, controls, stats, treno, vagone, vagone1, vagone2, testa, set4Ruote, set4Ruote1, set4Ruote2,
+        var scene, camera, renderer, controls, stats, treno, vagone, vagone1, vagone2, testa,
         setRuoteTestaDietro, setRuoteDietro, setRuoteDavanti, setRuoteTestaDavanti, setRuoteCabina, setRuoteDietro1, setRuoteDavanti1,
         setRuoteDietro2, setRuoteDavanti2, tempoInizio, vagone, locomotiva, vagone1, vagone2, trainControls,
-        stopTime, lastMoveTime, pivotLocomotiva, pivotVagone, pivotVagone1, pivotVagone2, toDegree, bollaDiVapore;
+        stopTime, lastMoveTime, pivotLocomotiva, pivotVagone, pivotVagone1, pivotVagone2, toDegree, bollaDiVapore, bollaDiVapore1,
+        bollaDiVapore2;
 		
 		//return array with height data from img, taken from: http://danni-three.blogspot.it/2013/09/threejs-heightmaps.html
 		function getHeightData(img,scale) {
@@ -198,7 +199,7 @@
             locomotiva.add(testaCamino);
 
             //fumo
-            var vapore = new THREE.MeshBasicMaterial({color: 0x888888 , wireframe: true})
+            var vapore = new THREE.MeshBasicMaterial({color: 0xaaaaaa , wireframe: true})
             bollaDiVapore  = new THREE.Mesh( geometry, vapore);
             bollaDiVapore.scale.set(0.3,0.3,0.3);
             bollaDiVapore.rotation.x = 45 * toDegree;
@@ -206,6 +207,12 @@
             bollaDiVapore.position.y = 3;
             bollaDiVapore.position.x = 1.5;
             locomotiva.add(bollaDiVapore);
+
+            bollaDiVapore1 = bollaDiVapore.clone();
+            locomotiva.add(bollaDiVapore1);
+
+            bollaDiVapore2 = bollaDiVapore.clone();
+            locomotiva.add(bollaDiVapore2);
 
             //ruote
             setDiRuote = new THREE.Object3D();
@@ -393,11 +400,38 @@
 		
 		function Update() {
             var clock = Date.now() - tempoInizio - stopTime;
-
-            //la bolla si anima anche se il treno è fermo
-            var bollaTempo = ((Date.now() - tempoInizio) / 1000) % 3;
-            bollaDiVapore.scale.set(bollaTempo,bollaTempo,bollaTempo);
-            bollaDiVapore.position.y = bollaTempo + 3;
+            var bollaTempo = ((Date.now() - tempoInizio) / 1000);
+            //le bolle rimangono animate per un po dopo che il treno si ferma
+            if(stopTime - trainControls.delay == 0){           
+                bollaDiVapore.scale.set(bollaTempo % 2,bollaTempo % 2,bollaTempo % 2);
+                bollaDiVapore.position.y = (bollaTempo % 2 * 2) + 3;
+                bollaDiVapore1.scale.set((bollaTempo + 0.75) % 2,(bollaTempo + 0.75) % 2,(bollaTempo + 0.75) % 2);
+                bollaDiVapore1.position.y = ((bollaTempo + 0.75) % 2 * 2) + 3;
+                bollaDiVapore2.scale.set((bollaTempo + 1.5) % 2,(bollaTempo + 1.5) % 2,(bollaTempo + 1.5) % 2);
+                bollaDiVapore2.position.y = ((bollaTempo + 1.5) % 2 * 2) + 3;
+            }else{
+                if(bollaDiVapore.position.y >2.5 && bollaDiVapore.position.y < 6.9){
+                    bollaDiVapore.scale.set(bollaTempo % 2,bollaTempo % 2,bollaTempo % 2);
+                    bollaDiVapore.position.y = (bollaTempo % 2 * 2) + 3;
+                }else{
+                    bollaDiVapore.scale.set(0.1,0.1,0.1);
+                    bollaDiVapore.position.y = 2.5;
+                }
+                if(bollaDiVapore1.position.y >2.5 && bollaDiVapore.position.y < 6.9){
+                    bollaDiVapore1.scale.set((bollaTempo + 0.75) % 2,(bollaTempo + 0.75) % 2,(bollaTempo + 0.75) % 2);
+                    bollaDiVapore1.position.y = ((bollaTempo + 0.75) % 2 * 2) + 3;
+                }else{
+                    bollaDiVapore1.scale.set(0.1,0.1,0.1);
+                    bollaDiVapore1.position.y = 2.5;
+                }
+                if(bollaDiVapore1.position.y >2.5 && bollaDiVapore.position.y < 6.9){
+                    bollaDiVapore2.scale.set((bollaTempo + 1.5) % 2,(bollaTempo + 1.5) % 2,(bollaTempo + 1.5) % 2);
+                    bollaDiVapore2.position.y = ((bollaTempo + 1.5) % 2 * 2) + 3;
+                }else{
+                    bollaDiVapore2.scale.set(0.1,0.1,0.1);
+                    bollaDiVapore2.position.y = 2.5;
+                }
+            }
 
             if(trainControls.moveTrain){
                 var partePercorso = (clock / 1000) % 100;

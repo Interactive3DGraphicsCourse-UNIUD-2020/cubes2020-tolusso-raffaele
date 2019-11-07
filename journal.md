@@ -48,5 +48,5 @@ Ho sistemato l' Heightmap in modo che rappresenti il circuito e aggiunto l'anima
 
 ![spiegazione moto in salita](documentazione/motoY.jpeg)
 
-Ho modificato molti materiali e aggiunto le textures a quasi tutte le parti del treno e aggiunto il vapore alla locomotiva che rimane animato anche per un po' dopo che la locomotiva si ferma. Ho reimpostato l'up della camera a quello di default dato che l'Heightmap suggerisce anche una vista verso -Z (le montagne sono in quella direzione).
+Ho modificato molti materiali e aggiunto le textures a quasi tutte le parti del treno e aggiunto il vapore alla locomotiva che rimane animato anche per un po' dopo che la locomotiva si ferma. Ho reimpostato l'up della camera a quello di default dato che l'Heightmap suggerisce anche una vista verso -Z (le montagne sono in quella direzione). Migliorato il metodo di caricamento delle texture per i cubi del terreno in modo da non generare 1 materiale per cubo e migliorare le prestazioni.
 

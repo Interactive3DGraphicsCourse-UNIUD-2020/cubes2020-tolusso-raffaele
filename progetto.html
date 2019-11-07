@@ -69,34 +69,39 @@
             var width = img.width;
             var height = img.height;
             var grass = THREE.ImageUtils.loadTexture('textures/grass.jpg');
+            var grass = new THREE.MeshPhongMaterial( { map: grass } );
             var water = THREE.ImageUtils.loadTexture('textures/water.jpg');
+            var water = new THREE.MeshPhongMaterial( { map: water } );
             var rock  = THREE.ImageUtils.loadTexture('textures/rock.jpg');
+            var rock = new THREE.MeshPhongMaterial( { map: rock } );
             var snow  = THREE.ImageUtils.loadTexture('textures/snow.jpg');
+            var snow = new THREE.MeshPhongMaterial( { map: snow } );
             var ground = THREE.ImageUtils.loadTexture('textures/ground.jpg');
+            var ground = new THREE.MeshPhongMaterial( { map: ground } );
 			for(i = 0 ; i < data.length; i++){
-                var texture = rock;
+                var cube;
                 if(data[i]<7){
-                    texture = water;
+                    cube = new THREE.Mesh( cube_geometry, water ) ;
                 }else{
                     if(data[i]<13){
-                        texture = grass;
+                        cube = new THREE.Mesh( cube_geometry, grass ) ;
                     }else{
                         if(data[i]>24){
-                            texture = snow;
+                            cube = new THREE.Mesh( cube_geometry, snow ) ;
                         }else{
                             if(data[i]<20){
-                                texture = ground;
+                                cube = new THREE.Mesh( cube_geometry, ground ) ;
+                            }else{
+                                cube = new THREE.Mesh( cube_geometry, rock ) ;
                             }
                         }
                     }
                 }
-                var cube_material = new THREE.MeshPhongMaterial( { map: texture } );
-				var cube = new THREE.Mesh( cube_geometry, cube_material ) ;
 				cube.position.set(i % width - width/2, data[i]/2, i/width-height/2);
                 if(data[i] != 0){
                     cube.scale.set(1, data[i], 1);
-                }else{
-                    cube.scale.set(1, 0.5, 1);
+                }else{ 
+                    cube.scale.set(1, 0.1, 1);
                 }
                 cube.castShadow = true;
 			    cube.receiveShadow = true;
@@ -590,7 +595,7 @@
                         vagone2.rotation.z = toDegree *(-15) * (partePercorso-48.5);
                         pivotVagone2.position.x = 10 - (partePercorso - 48.5);
                     }else{
-                        if(partePercorso<=69){
+                        if(partePercorso<=68){
                             vagone2.rotation.z = toDegree *(-15);
                             pivotVagone2.position.x = 10 - (partePercorso - 48.5);
                             pivotVagone2.position.y = (20 * Math.tan(toDegree * 15) - (partePercorso -48.5) * Math.tan(toDegree * 15));
